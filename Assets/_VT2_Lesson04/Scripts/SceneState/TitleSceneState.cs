@@ -1,30 +1,41 @@
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-public class TitleSceneState : IState
+public class TitleSceneState : BaseSceneState
 {
-    // ===  メンバ変数  === //
-    private SceneManager _sceneManager;
+    // ===  HUD設定  === //
+    public override string HudAddress { get; protected set; } = "Assets/_VT2_Lesson04/Prefab/TitleHUDCanvas_FullHD.prefab";
 
-    public void Enter()
+    private TitleHUDController _hudController;
+
+    private int _score;
+
+    public override void Enter()
     {
-        Debug.Log($"{GetType().Name} が始まります");
+        base.Enter();
 
-        // SceneManagerを取得
-        _sceneManager = GameObject.FindAnyObjectByType<SceneManager>();
+        // HUDビューを初期化
+        var hudView = new TitleHUDView();
+        hudView.Initialize(_hudCanvas.GetComponent<Canvas>());
+
+        // HUDのコントローラーを初期化
+        _hudController = new TitleHUDController(hudView, this);
     }
 
-    public void Execute()
+    public override void Execute()
     {
-        if(Mouse.current.leftButton.wasPressedThisFrame)
+        if (Mouse.current.leftButton.wasPressedThisFrame)
         {
             // ゲーム画面に切り替える
             _sceneManager.ChangeScene(new GameSceneState());
         }
+
+        base.Execute();
     }
 
-    public void Exit()
+    public void AddScore()
     {
-        Debug.Log($"{GetType().Name} が終了します");
+        _score++;
     }
 }
